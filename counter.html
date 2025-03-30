@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>120-Second Counter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            transition: background-color 0.5s;
+            padding-top: 50px;
+        }
+        
+        .counter {
+            font-size: 5rem;
+            margin: 30px 0;
+        }
+        
+        button {
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .time-up {
+            font-size: 2rem;
+            color: white;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        #startBtn.paused {
+            background-color: #f39c12;
+        }
+        
+        #startBtn.paused:hover {
+            background-color: #e67e22;
+        }
+    </style>
+</head>
+<body>
+    <h1>120-Second Counter</h1>
+    <div class="counter" id="counter">02:00</div>
+    <div class="time-up" id="timeUp">TIME'S UP!</div>
+    
+    <button id="startBtn">Start Counter</button>
+    <button id="restartBtn">Restart & Start</button>
+    
+    <script>
+        const counter = document.getElementById('counter');
+        const startBtn = document.getElementById('startBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const timeUp = document.getElementById('timeUp');
+        
+        let timeLeft = 120; // 120 seconds
+        let timerInterval;
+        let isRunning = false;
+        
+        function updateCounter() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            counter.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                document.body.style.backgroundColor = 'red';
+                timeUp.style.display = 'block';
+                startBtn.textContent = 'Start Counter';
+                startBtn.classList.remove('paused');
+                startBtn.disabled = true;
+            }
+        }
+        
+        function startTimer() {
+            if (timeLeft <= 0) return;
+            
+            isRunning = true;
+            startBtn.textContent = 'Pause Counter';
+            startBtn.classList.remove('paused');
+            timeUp.style.display = 'none';
+            document.body.style.backgroundColor = '';
+            
+            clearInterval(timerInterval); // Clear any existing interval
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateCounter();
+            }, 1000);
+        }
+        
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            startBtn.textContent = 'Resume Counter';
+            startBtn.classList.add('paused');
+        }
+        
+        function toggleTimer() {
+            if (isRunning) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        }
+        
+        function restartTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 120;
+            isRunning = true;
+            updateCounter();
+            startBtn.textContent = 'Pause Counter';
+            startBtn.classList.remove('paused');
+            startBtn.disabled = false;
+            timeUp.style.display = 'none';
+            document.body.style.backgroundColor = '';
+            
+            // Start the timer immediately
+            startTimer();
+        }
+        
+        startBtn.addEventListener('click', toggleTimer);
+        restartBtn.addEventListener('click', restartTimer);
+        
+        // Initialize counter display
+        updateCounter();
+    </script>
+</body>
+</html>
